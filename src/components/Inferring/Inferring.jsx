@@ -1,7 +1,15 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
+import Webcam from "react-webcam";
 import axios from 'axios'
 import test1 from '../../assets/test1.jpg'
 import { Container, Grid } from "@mui/material";
+
+const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: "environment"
+};
+
 
 const Inferring = () => {
  
@@ -9,6 +17,22 @@ const Inferring = () => {
     const [cards, setCards] = useState([]);
     const [decks, setDecks] = useState([]);
     const [cardType, setCardType] = useState([]);
+    const [deviceId, setDeviceId] = useState({});
+    const [devices, setDevices] = useState([]);
+    const [image, setImage] = useState("");
+    const webcamRef = useRef(null);
+
+    const snapImage = useCallback(
+        () => {
+            const imgSrc = webcamRef.current.getScreenshot();
+            setImage(imgSrc);
+        },[webcamRef]);
+
+    const handleDevices = useCallback(
+        mediaDevices =>
+            setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
+        [setDevices]
+    );    
 
     useEffect(() => {
         //inferringHandler()
@@ -18,12 +42,13 @@ const Inferring = () => {
                 decks.push(card)
                 cardType.push(card.class)
             }
-            
         })
+
+        navigator.mediaDevices.enumerateDevices().then(handleDevices);
 
         console.log(decks)
         console.log(cardType)
-    }, [cards, decks]);
+    }, [cards, decks, handleDevices]);
 
     const uploadImage = async (e) => {
         const file = e.target.files[0];
@@ -78,6 +103,42 @@ const Inferring = () => {
 
     return (
         <div className='inferring'>
+            <div className='device-select'>
+            {devices.map((device, key) => (
+          <div>
+            <Webcam audio={false} videoConstraints={{ deviceId: device.deviceId }} />
+            {device.label || `Device ${key + 1}`}
+          </div>
+
+        ))}
+            </div>
+            <div className='webcam' >
+                <div className="webcam-img">
+                    {image == '' ? <Webcam id='video'
+                        audio={false}
+                        height={200}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        width={220}
+                        videoConstraints={videoConstraints}
+                    /> : <img src={image} />}
+                    </div>
+                    <div>
+                    {image != '' ?
+                        <button onClick={(e) => {
+                            e.preventDefault();
+                            setImage('')
+                        }}
+                            className="webcam-btn">
+                            Retake Image</button> :
+                        <button onClick={(e) => {
+                            e.preventDefault();
+                            snapImage();
+                        }}
+                            className="webcam-btn">Capture</button>
+                    }
+                </div>
+            </div>
             <p>Inferring</p>
 
             <input
