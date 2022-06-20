@@ -2,20 +2,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 6rem;
     flex-direction: row;
+    margin-bottom: 25px;
 
 
 }
 
-.solitaireSolver-header p {
+.solitaireSolver-header a {
     color: #fff;
-    font-family: var(--font-family);
+    font-family: system-ui;
     font-weight: 500;
-    font-size: 18px;
-    line-height: 25px;
+    font-size: 56px;
+    line-height: 2px;
     text-transform: capitalize;
-
-    margin: 0 1rem;
+    
+    margin: 0 rem;
     cursor: pointer;
 }

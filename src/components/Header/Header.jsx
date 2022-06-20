@@ -3,7 +3,7 @@ import './header.css'
 
 const Menu = () => (
     <>
-    <p><a href='#'>Solitaire Solver</a></p>
+    <p><a href='/'>Solitaire Solver</a></p>
     </>
 )
 

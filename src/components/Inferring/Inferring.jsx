@@ -1,14 +1,21 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Webcam from "react-webcam";
 import axios from 'axios'
-import test1 from '../../assets/test1.jpg'
+import back from '../../assets/Back/backdesign.png'
 import { Container, Grid } from "@mui/material";
+import ReactiveButton from 'reactive-button'
+import { useStopwatch, useTime } from 'react-timer-hook';
+import "./inferring.css"
+import C1 from '../../assets/Clover/card_1_clover.png' 
+
 
 const videoConstraints = {
-    width: 1280,
-    height: 720,
+    width: 800,
+    height: 600,
     facingMode: "environment"
 };
+
+
 
 
 const Inferring = () => {
@@ -16,11 +23,13 @@ const Inferring = () => {
     const [base64Img, setBase64Img] = useState("")
     const [cards, setCards] = useState([]);
     const [decks, setDecks] = useState([]);
-    const [cardType, setCardType] = useState([]);
-    const [deviceId, setDeviceId] = useState({});
-    const [devices, setDevices] = useState([]);
+    const [lastCard, setLastCard] = useState("");
     const [image, setImage] = useState("");
     const webcamRef = useRef(null);
+    const deck = []
+    const [state, setState] = useState('idle');
+    const { seconds, minutes,} = useStopwatch({autoStart: true })
+    var index = 0
 
     const snapImage = useCallback(
         () => {
@@ -28,27 +37,24 @@ const Inferring = () => {
             setImage(imgSrc);
         },[webcamRef]);
 
-    const handleDevices = useCallback(
-        mediaDevices =>
-            setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
-        [setDevices]
-    );    
+  
 
     useEffect(() => {
         //inferringHandler()
-
+        /*
         cards.forEach((card) => {
             if (!cardType.includes(card.class)) {
                 decks.push(card)
                 cardType.push(card.class)
             }
+            
         })
+        */
 
-        navigator.mediaDevices.enumerateDevices().then(handleDevices);
 
         console.log(decks)
-        console.log(cardType)
-    }, [cards, decks, handleDevices]);
+        
+    }, [cards, decks]);
 
     const uploadImage = async (e) => {
         const file = e.target.files[0];
@@ -79,7 +85,7 @@ const Inferring = () => {
             params: {
                 api_key: "MaCUsCNKb6RTjsTmT9TK"
             },
-            data: base64Img,
+            data: image,
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
@@ -99,68 +105,100 @@ const Inferring = () => {
 
     }
 
+    const scanCardHandler = (e) => {
+        setState('loading');
+        setTimeout(() => {
+            setState('success');
+            //e.preventDefault();
+            snapImage();
+            detection()
+
+        }, 500)
+    }
+
+    const retakeHandler = (e) => {
+        setState('loading');
+        setTimeout(() => {
+            setState('idle');
+            //e.preventDefault();
+            setImage('')
+        }, 100)
+    }
+
+    
+function detection () {
+    window.roboflow.auth({
+        publishable_key: "rf_YA5b7jCLYRd4eML6CHfZXTqUSNt1"
+    }).load({
+        model: "cardssolitaire",
+        version: 5
+    }).then(function(model) {
+        model.configure({
+            threshold: 0.65,
+            overlap: 0.5,
+            max_objects: 20,
+        })
+        
+        .detect(document.getElementById("detectImg")).then(function(predictions) {
+            console.log("Predictions:", predictions);
+            setLastCard(predictions[0].class + "Confidence" + predictions[0].confidence)
+            setCards(cards => [...cards, lastCard])
+            
+        });
+        
+    });
+
+}
+    
+
   
 
     return (
         <div className='inferring'>
-            <div className='device-select'>
-            {devices.map((device, key) => (
-          <div>
-            <Webcam audio={false} videoConstraints={{ deviceId: device.deviceId }} />
-            {device.label || `Device ${key + 1}`}
-          </div>
-
-        ))}
+            <div className='timer' style={{fontSize: '24px'}}>
+                <a>{minutes}</a><a>:</a><a>{seconds}</a>
             </div>
             <div className='webcam' >
                 <div className="webcam-img">
                     {image == '' ? <Webcam id='video'
                         audio={false}
-                        height={200}
+                        
                         ref={webcamRef}
                         screenshotFormat="image/jpeg"
-                        width={220}
+                        
                         videoConstraints={videoConstraints}
-                    /> : <img src={image} />}
-                    </div>
-                    <div>
+                    /> : <img id='detectImg' src={image} />}
+                </div>
+                <div className='scan-btn'>
                     {image != '' ?
-                        <button onClick={(e) => {
-                            e.preventDefault();
-                            setImage('')
-                        }}
-                            className="webcam-btn">
-                            Retake Image</button> :
-                        <button onClick={(e) => {
-                            e.preventDefault();
-                            snapImage();
-                        }}
-                            className="webcam-btn">Capture</button>
+                        
+                        <ReactiveButton
+                            onClick={retakeHandler}
+                            color={'green'}
+                            rounded={true}
+                            size={'large'}
+                            idleText={'New Card'}
+                        /> :
+                        <ReactiveButton 
+                        buttonState={state}
+                        onClick={scanCardHandler}
+                        className="webcam-btn"
+                        rounded={true}
+                        size={'large'}
+                        idleText={'Scan Card'}/>
+                            
                     }
                 </div>
             </div>
-            <p>Inferring</p>
 
-            <input
-            type="file"
-            onChange={(e) => {
-            uploadImage(e);
-            }}
-            />
-            <br></br>
-            <img src={base64Img} height='200px' />
-            <button onClick={inferringHandler} variant="primary" type="submit">
-                Go
-            </button>
-            <div className='predictions'>
-                {decks.map((deck) => (
-                    <p key={deck}>{deck.class}</p>
-                    
-                ))}
+            <div className='scanned-card'>
+
+                {lastCard == 'AC' ? <img src={C1}/> : <img src={back} width={62} height={84}  /> }
+                <h1>{lastCard}</h1>
+                
             </div>
-            
-            
 
+            
             
         </div>
         
