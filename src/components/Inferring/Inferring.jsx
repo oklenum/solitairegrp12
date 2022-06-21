@@ -6,7 +6,11 @@ import { Container, Grid } from "@mui/material";
 import ReactiveButton from 'reactive-button'
 import { useStopwatch, useTime } from 'react-timer-hook';
 import "./inferring.css"
-import C1 from '../../assets/Clover/card_1_clover.png' 
+import {cardImage} from '../../images'
+import {
+    C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,
+    H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,
+} from '../../assets'
 
 
 const videoConstraints = {
@@ -29,6 +33,9 @@ const Inferring = () => {
     const deck = []
     const [state, setState] = useState('idle');
     const { seconds, minutes,} = useStopwatch({autoStart: true })
+    const [ tableau, setTableau ] = useState("")
+    const [step, setStep] = useState(0)
+    const [cardImg, setCardImg] = useState("");
     var index = 0
 
     const snapImage = useCallback(
@@ -38,72 +45,41 @@ const Inferring = () => {
         },[webcamRef]);
 
   
+    useEffect(() => {
+        if (step == 0) {
+            setTableau("First Card in Tableau 1")
+        }
+        if (step == 1) {
+            setTableau("Second Card in Tableau 2")
+        }
+        if (step == 2) {
+            setTableau("Third Card in Tableau 3")
+        }
+        if (step == 3) {
+            setTableau("Forth Card in Tableau 4")
+        }
+        if (step == 4) {
+            setTableau("Fifth Card in Tableau 5")
+        }
+        if (step == 5) {
+            setTableau("Sixth Card in Tableau 6")
+        }
+        if (step == 6) {
+            setTableau("Seventh Card in Tableau 7")
+        }
+        if (step > 6) {
+            setTableau("Complete, Initial Setup")
+        }
+        
+    }, [step]);
 
     useEffect(() => {
-        //inferringHandler()
-        /*
-        cards.forEach((card) => {
-            if (!cardType.includes(card.class)) {
-                decks.push(card)
-                cardType.push(card.class)
-            }
-            
-        })
-        */
+       // setCardImg(cardImage(lastCard))
+    }, [lastCard]);
 
+   
 
-        console.log(decks)
-        
-    }, [cards, decks]);
-
-    const uploadImage = async (e) => {
-        const file = e.target.files[0];
-        const base64 = await convertBase64(file);
-        setBase64Img(base64);
-    };
-
-    const convertBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const fileReader = new FileReader();
-          fileReader.readAsDataURL(file);
-    
-          fileReader.onload = () => {
-            resolve(fileReader.result);
-          };
-    
-          fileReader.onerror = (error) => {
-            reject(error);
-          };
-        });
-      };
-
-    const inferringHandler = async (e) => {
-        e.preventDefault()
-        await axios({
-            method: "POST",
-            url: "https://detect.roboflow.com/playing-cards-ow27d/1",
-            params: {
-                api_key: "MaCUsCNKb6RTjsTmT9TK"
-            },
-            data: image,
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-        })
-        .then(response => {
-            var convert = JSON.stringify(response.data)
-            var output = JSON.parse(convert);
-            //var obj = JSON.parse(convert.predictions)
-            //console.log(obj[0].class)
-            setCards(output.predictions)
-            console.log(output.predictions[0].class)
-
-        })
-        .catch(error => {
-            console.log(error.message);
-        });
-
-    }
+ 
 
     const scanCardHandler = (e) => {
         setState('loading');
@@ -141,17 +117,27 @@ function detection () {
         
         .detect(document.getElementById("detectImg")).then(function(predictions) {
             console.log("Predictions:", predictions);
-            setLastCard(predictions[0].class + "Confidence" + predictions[0].confidence)
-            setCards(cards => [...cards, lastCard])
+            if (predictions.length !== 0) {
+                setLastCard(predictions[0].class + "Confidence" + predictions[0].confidence)
+                setDecks([...decks, predictions[0].class])
+                setCardImg(predictions[0].class)
+                setStep((step) => step + 1);
+                setCards(cards => [...cards, lastCard])
+            } else {
+                window.alert("No card predictions found, scan again")
+                setCardImg('')
+                setLastCard('')
+            }
+            
+            setImage('')
             
         });
+        
         
     });
 
 }
     
-
-  
 
     return (
         <div className='inferring'>
@@ -170,31 +156,29 @@ function detection () {
                     /> : <img id='detectImg' src={image} />}
                 </div>
                 <div className='scan-btn'>
-                    {image != '' ?
-                        
-                        <ReactiveButton
-                            onClick={retakeHandler}
-                            color={'green'}
-                            rounded={true}
-                            size={'large'}
-                            idleText={'New Card'}
-                        /> :
-                        <ReactiveButton 
-                        buttonState={state}
+                    <ReactiveButton
                         onClick={scanCardHandler}
-                        className="webcam-btn"
+                        buttonState={state}
+                        color={'green'}
                         rounded={true}
                         size={'large'}
-                        idleText={'Scan Card'}/>
-                            
-                    }
+                        idleText={'Draw Next!'}
+                    />
                 </div>
             </div>
 
             <div className='scanned-card'>
+                <h2>{"Scan " + tableau} </h2>
 
-                {lastCard == 'AC' ? <img src={C1}/> : <img src={back} width={62} height={84}  /> }
+                <img src={cardImage(cardImg)} width={62} height={84} />
+                
                 <h1>{lastCard}</h1>
+                <ol>
+                {decks.map(d => (
+                    <li key={d}>{d}</li>
+                ))}
+                </ol>
+                
                 
             </div>
 

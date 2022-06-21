@@ -20,9 +20,22 @@ const Steps = () => {
 
   return (
     <div className='steps'>
+        <div className='cards-box'>
+            <Box
+            sx={{
+                width: 500,
+                height: 750,
+                backgroundColor: 'blue',
+            }}
+            >
+                <h1>Algorithm</h1>
+                <h3>Steps: </h3>
+            </Box>
+        </div>
+        <div className='adjust-cards'>
         <ReactiveButton
             onClick={dialogOpenHandler}
-            color={'blue'}
+            color={'red'}
             rounded={true}
             size={'large'}
             idleText={'Adjust Card'}
@@ -50,6 +63,8 @@ const Steps = () => {
                 <Button onClick={dialogCloseHandler}>Proceed</Button>
             </DialogActions>
         </Dialog>
+        </div>
+        
 
     </div>
   )
