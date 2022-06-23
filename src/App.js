@@ -1,10 +1,9 @@
 import React from "react";
 import "./App.css";
 
-import { CameraFeed, Header, Inferring, Start } from "./components";
+import { Header, Detection, Start } from "./components";
 
 import { Switch, Route } from "react-router-dom";
-import { Box, Paper, Grid } from "@mui/material";
 
 const App = () => {
   return (
@@ -12,7 +11,7 @@ const App = () => {
       <Header />
       <Switch>
         <Route exact path="/" component={Start} />
-        <Route exact path="/game" component={Inferring} />
+        <Route exact path="/game" component={Detection} />
       </Switch>
     </div>
   );

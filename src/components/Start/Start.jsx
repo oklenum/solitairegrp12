@@ -8,7 +8,6 @@ https://sourceforge.net/projects/vector-cards/
 import React, { useState } from 'react'
 import './start.css'
 import ReactiveButton from 'reactive-button'
-import { Link } from 'react-router-dom';
 
 
 const Start = () => {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
-import axios from "axios";
-import back from "../../assets/Back/backdesign.png";
+
 import {
   TextField,
   Dialog,
@@ -14,16 +13,14 @@ import {
   Grid,
 } from "@mui/material";
 import ReactiveButton from "reactive-button";
-import { useStopwatch, useTime } from "react-timer-hook";
-import "./inferring.css";
+import { useStopwatch } from "react-timer-hook";
+import "./detection.css";
 import { cardImage } from "../../images";
-import { stepAfterScan } from "./stepss";
-import { arr } from "./stepss"
+
 import {
-  getFirstTableu,
   insertCardToArray,
   insertCardToTalon,
-  isMatchInTableu,
+  
   matchInTableu,
   talonMatchInTableu,
   tableuKingMatchInTableu,
@@ -31,13 +28,8 @@ import {
   tableuMatchInSuit,
   talonKingMatchInTableu,
   moveCard,
-  getMatchTableu,
-  getIndexOfFirstTableuCard,
-  getMatchTableuRow,
-  getTableuRowFromIndex,
-  determineColorOfCard,
-  determineOppositeColorOfCard,
-  getLastTableu,
+  
+  
 } from "../../algorithm/script.js";
 import {
   clubStack,
@@ -65,7 +57,6 @@ const videoConstraints = {
 const Inferring = () => {
   const [decks, setDecks] = useState([]);
   const [algoSteps, setAlgoSteps] = useState([]);
-  const [instruction, setInstruction] = useState("");
   const [lastCard, setLastCard] = useState("");
   const [image, setImage] = useState("");
   const webcamRef = useRef(null);
@@ -73,7 +64,7 @@ const Inferring = () => {
   const [state, setState] = useState("idle");
   const { seconds, minutes } = useStopwatch({ autoStart: true });
   const [tableau, setTableau] = useState("");
-  const [step, setStep] = useState(7);
+  const [step, setStep] = useState(0);
   const [cardImg, setCardImg] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [lastFromArray, setLastFromArray] = useState([]);
@@ -92,44 +83,44 @@ const Inferring = () => {
   }, [webcamRef]);
 
   useEffect(() => {
-    if (step == 0) {
+    if (step === 0) {
       setTableau("First Card in Tableau 1");
     }
-    if (step == 1) {
+    if (step === 1) {
       setTableau("Second Card in Tableau 2");
     }
-    if (step == 2) {
+    if (step === 2) {
       setTableau("Third Card in Tableau 3");
     }
-    if (step == 3) {
+    if (step === 3) {
       setTableau("Forth Card in Tableau 4");
     }
-    if (step == 4) {
+    if (step === 4) {
       setTableau("Fifth Card in Tableau 5");
     }
-    if (step == 5) {
+    if (step === 5) {
       setTableau("Sixth Card in Tableau 6");
     }
-    if (step == 6) {
+    if (step === 6) {
       setTableau("Seventh Card in Tableau 7");
     }
-    if (step == 7) {
+    if (step === 7) {
       setTableau("Scan Talon Card");
     }
-    if (step == 8) {
+    if (step === 8) {
       setTableau("Press draw next")
 
     }
     if (step > 8) {
       setTableau("Scan card if new revealed or press draw next")
     }
-    if (step == 997) {
+    if (step === 997) {
       setTableau("Scan Revealed Card In Tableau")
     }
-    if (step == 998) {
+    if (step === 998) {
       setTableau("Scan Revealed Card In Tableau")
     }
-    if (step == 999) {
+    if (step === 999) {
       setTableau("Scan Revealed Card In Tableau")
     }
 
@@ -168,14 +159,7 @@ const Inferring = () => {
     }, 500);
   };
 
-  const retakeHandler = (e) => {
-    setState("loading");
-    setTimeout(() => {
-      setState("idle");
-      //e.preventDefault();
-      setImage("");
-    }, 100);
-  };
+ 
   /*
   Roboflow script: https://cdn.roboflow.com/0.2.22/roboflow.js
   Brugt i forbindelse med billedegenkendelsen hvor de tilbyder et node.js
@@ -209,43 +193,43 @@ const Inferring = () => {
                 predictions[0].confidence
               );
 
-              if (step == 0) {
+              if (step === 0) {
                 insertCardToArray(tableu1, cardFormatter(predictions[0].class))
               }
-              if (step == 1) {
+              if (step === 1) {
                 insertCardToArray(tableu2, cardFormatter(predictions[0].class))
               }
-              if (step == 2) {
+              if (step === 2) {
                 insertCardToArray(tableu3, cardFormatter(predictions[0].class))
               }
-              if (step == 3) {
+              if (step === 3) {
                 insertCardToArray(tableu4, cardFormatter(predictions[0].class))
               }
-              if (step == 4) {
+              if (step === 4) {
                 insertCardToArray(tableu5, cardFormatter(predictions[0].class))
               }
-              if (step == 5) {
+              if (step === 5) {
                 insertCardToArray(tableu6, cardFormatter(predictions[0].class))
               }
-              if (step == 6) {
+              if (step === 6) {
                 insertCardToArray(tableu7, cardFormatter(predictions[0].class))
               }
-              if (step == 7) {
+              if (step === 7) {
                 insertCardToTalon(talon, cardFormatter(predictions[0].class))
               }
-              if (step == 997) {
+              if (step === 997) {
 
                 lastFromArray.pop()
                 insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
                 setStep(8)
               }
-              if (step == 998) {
+              if (step === 998) {
 
                 lastFromArray.pop()
                 insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
                 setStep(8)
               }
-              if (step == 999) {
+              if (step === 999) {
 
                 lastFromArray.pop()
                 insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
@@ -325,7 +309,7 @@ const Inferring = () => {
 
                 setLastFromArray(fromArray);
                 if (fromArray.length > 0) {
-                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                  if (fromArray[fromArray.length - 1].suit === "Empty") {
                     setStep(998);
                   }
                 }
@@ -361,7 +345,7 @@ const Inferring = () => {
 
                 setLastFromArray(fromArray);
                 if (fromArray.length > 0) {
-                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                  if (fromArray[fromArray.length - 1].suit === "Empty") {
                     setStep(997);
                   }
                 }
@@ -380,7 +364,7 @@ const Inferring = () => {
 
                 setLastFromArray(fromArray);
                 if (fromArray.length > 0) {
-                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                  if (fromArray[fromArray.length - 1].suit === "Empty") {
                     setStep(999);
                   }
                 }
@@ -395,6 +379,7 @@ const Inferring = () => {
                   talon[0].value + talon[0].suit + " to T" + talonKingMatchInTableu().tableuRow,
                 ]);
                  moveCard(talon, 0, toArray)
+                 setStep(7)
                }
 
 
@@ -435,7 +420,7 @@ const Inferring = () => {
             </div>
             <div className="webcam">
               <div className="webcam-img">
-                {image == "" ? (
+                {image === "" ? (
                   <Webcam
                     id="video"
                     audio={false}
@@ -444,7 +429,7 @@ const Inferring = () => {
                     videoConstraints={videoConstraints}
                   />
                 ) : (
-                  <img id="detectImg" src={image} />
+                  <img id="detectImg" src={image} alt="" />
                 )}
               </div>
               <div className="scan-btn">
@@ -462,7 +447,7 @@ const Inferring = () => {
             <div className="scanned-card">
               <h2>{tableau} </h2>
 
-              <img src={cardImage(cardImg)} width={62} height={84} />
+              <img src={cardImage(cardImg)} width={62} height={84} alt="" />
 
               <h1>{lastCard}</h1>
               <ol>
@@ -490,7 +475,6 @@ const Inferring = () => {
                     <li key={a}>{a}</li>
                   ))}
                 </ol>
-                <h2>{instruction}</h2>
               </Box>
             </div>
             <div className="adjust-cards">
