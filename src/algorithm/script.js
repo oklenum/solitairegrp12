@@ -53,6 +53,7 @@ export function talonMatchInTableu() {
   var talonCard = talonArray[0]
   var lastTableu = reformatCardArray(getLastTableu())
   var isMatch = false
+  var toIndex
   var toArray
   for (var i = 0; i < lastTableu.length; i++) {
     if (talonCard != undefined && lastTableu != undefined) {
@@ -60,11 +61,12 @@ export function talonMatchInTableu() {
         talonCard.suit !== lastTableu[i].suit) {
         isMatch = true
         toArray = getTableuRowFromIndex(i)
+        toIndex = i +1
       }
     }
 
   }
-  return { isMatch, toArray }
+  return { isMatch, toArray, toIndex }
 }
 
 // checks if an array has identical card in last Tableu

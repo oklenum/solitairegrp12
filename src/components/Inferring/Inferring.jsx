@@ -403,7 +403,7 @@ const Inferring = () => {
                 var toArray = talonMatchInTableu().toArray
                 setAlgoSteps([
                   ...algoSteps,
-                  talon[0].value + talon[0].suit + " to " + toArray[toArray.length-1].value + toArray[toArray.length-1].suit,
+                  talon[0].value + talon[0].suit + " to T" + talonMatchInTableu().toIndex,
                 ]);
                 moveCard(talon, 0, toArray)
                 setStep(7)
