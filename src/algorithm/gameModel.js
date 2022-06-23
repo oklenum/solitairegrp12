@@ -18,44 +18,44 @@ var talon = [];
 // tableau stacks
 var tableu1 = [{ suit: "D", value: 11 }];
 var tableu2 = [
-  { suit: "Empty", value: 0 },
+  { suit: "Empty", value: -1 },
   { suit: "C", value: 5 },
 ];
 var tableu3 = [
-  /*
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
+  
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
   { suit: "C", value: 6 },
-  */
+  
 ];
 var tableu4 = [
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
   { suit: "D", value: 6 },
 ];
 var tableu5 = [
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
   { suit: "S", value: 12 },
 ];
 var tableu6 = [
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "D", value: 1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "D", value: 8 },
 ];
 var tableu7 = [
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
-  { suit: "Empty", value: 0 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
+  { suit: "Empty", value: -1 },
   { suit: "C", value: 2 },
 ];
 

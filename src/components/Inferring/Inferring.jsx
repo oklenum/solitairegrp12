@@ -24,7 +24,9 @@ import {
   insertCardToArray,
   insertCardToTalon,
   isMatchInTableu,
+  matchInTableu,
   talonMatchInTableu,
+  tableuKingMatchInTableu,
   talonMatchInSuit,
   tableuMatchInSuit,
   talonKingMatchInTableu,
@@ -121,6 +123,12 @@ const Inferring = () => {
     if (step > 8) {
       setTableau("Scan card if new revealed or press draw next")
     }
+    if (step == 997) {
+      setTableau("Scan Revealed Card In Tableau")
+    }
+    if (step == 998) {
+      setTableau("Scan Revealed Card In Tableau")
+    }
     if (step == 999) {
       setTableau("Scan Revealed Card In Tableau")
     }
@@ -136,7 +144,7 @@ const Inferring = () => {
     console.log("Talon: ", talon)
     console.log("CSuitStack: ", clubStack)
     console.log("Current step", step)
-
+    console.log("LastFromArray", lastFromArray)
     /*
     if (stepAfterScan(step) !== undefined) {
       setAlgoSteps([
@@ -225,6 +233,18 @@ const Inferring = () => {
               if (step == 7) {
                 insertCardToTalon(talon, cardFormatter(predictions[0].class))
               }
+              if (step == 997) {
+
+                lastFromArray.pop()
+                insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
+                setStep(8)
+              }
+              if (step == 998) {
+
+                lastFromArray.pop()
+                insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
+                setStep(8)
+              }
               if (step == 999) {
 
                 lastFromArray.pop()
@@ -290,6 +310,30 @@ const Inferring = () => {
               }
               //}
 
+              // Priority 2
+              // Top tableu card matches bottom tableu card of another tableu row!
+              else if (matchInTableu().isMatch) {
+	              var fromArray = matchInTableu().fromArray
+	              var toArray = matchInTableu().toArray
+	              var index = matchInTableu().fromIndex
+                setAlgoSteps([
+                  ...algoSteps,
+                  fromArray[index].value + fromArray[index].suit + " to T" +
+                  matchInTableu().toIndex,
+                ]);
+                moveCard(fromArray, index, toArray)
+
+                setLastFromArray(fromArray);
+                if (fromArray.length > 0) {
+                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                    setStep(998);
+                  }
+                }
+
+              }
+              
+              
+
 
               //Priority 3
               else if (talonMatchInSuit().isMatch) {
@@ -301,6 +345,27 @@ const Inferring = () => {
                 moveCard(talon, 0, suitStack)
                 setStep(7)
               }
+
+              //Priority 3.5
+              else if(tableuKingMatchInTableu().isMatch) {
+                var fromArray = tableuKingMatchInTableu().fromArray
+                var toArray = tableuKingMatchInTableu().toArray
+                var fromIndex = tableuKingMatchInTableu().fromIndex
+                
+                setAlgoSteps([
+                  ...algoSteps,
+                  "13" + fromArray[fromArray].suit + " to T", tableuKingMatchInTableu().toIndex,
+                ]);
+
+                moveCard(fromArray, fromIndex, toArray)
+
+                setLastFromArray(fromArray);
+                if (fromArray.length > 0) {
+                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                    setStep(997);
+                  }
+                }
+            }
 
               //Priority 4
               else if (tableuMatchInSuit().isMatch) {

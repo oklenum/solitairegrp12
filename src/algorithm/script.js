@@ -112,34 +112,70 @@ export function matchInTableu() {
   var lastTableu = reformatCardArray(getLastTableu())
   var fromArray
   var toArray
-  var index
+  var toIndex
   var isMatch = false
   for (var i = 0; i < firstTableu.length; i++) {
     for (var j = 0; j < lastTableu.length; j++) {
-      if (firstTableu[i].value == lastTableu[j].value - 1 &&
-        firstTableu[i].suit !== lastTableu[j].suit &&
-        i !== j) {
-        index = i
-        fromArray = getTableuRowFromIndex(i + 1)
-        toArray = getTableuRowFromIndex(j + 1)
-        isMatch = true
+      if (firstTableu !== undefined && lastTableu !== undefined) {
+        if (firstTableu[i].value == lastTableu[j].value - 1 &&
+          firstTableu[i].suit !== lastTableu[j].suit &&
+          i !== j) {
+          isMatch = true
+          fromArray = getTableuRowFromIndex(i)
+          toIndex = j + 1
+          toArray = getTableuRowFromIndex(j)
+        }
       }
+
     }
   }
   var fromIndex
   if (isMatch == true) {
     for (var i = 0; i < fromArray.length; i++) {
       for (var j = 0; j < toArray.length; j++) {
-        if (fromArray[i].value == toArray[j].value - 1 &&
-          fromArray[i].suit !== toArray[j].suit) {
-          fromIndex = i
-        } else {
-          fromIndex = 0
+        if (fromArray !== undefined && toArray !== undefined) {
+          if (fromArray[i].value == toArray[j].value - 1 &&
+            fromArray[i].suit !== toArray[j].suit) {
+            fromIndex = i
+          }
         }
+
       }
     }
   }
-  return { isMatch, fromArray, fromIndex, toArray, index }
+  return { isMatch, fromArray, fromIndex, toArray, toIndex }
+  /*
+  var firstTableu = reformatCardArray(getFirstTableu())
+  var lastTableu = reformatCardArray(getLastTableu()) 
+  var fromArray
+  var toArray
+  var index
+  var isMatch = false
+  for(var i = 0; i < firstTableu.length; i++) {
+      for(var j = 0; j < lastTableu.length; j++) {
+          if (firstTableu[i].value == lastTableu[j].value - 1 &&
+              firstTableu[i].suit !== lastTableu[j].suit &&
+              i !== j) {
+              index = i
+              fromArray = getTableuRowFromIndex(i)
+              toArray = getTableuRowFromIndex(j)
+              isMatch = true
+          }
+      }
+  }
+  var fromIndex
+  if (isMatch == true) {
+      for(var i = 0; i < fromArray.length; i++) {
+          for(var j = 0; j < toArray.length; j++) {
+              if (fromArray[i].value == toArray[j].value - 1 &&
+                  fromArray[i].suit !== toArray[j].suit) {
+                  fromIndex = i
+              }
+          }
+      }
+  }
+  return {isMatch, fromArray, fromIndex, toArray, index}
+  */
 }
 
 
@@ -188,7 +224,7 @@ export function reformatCardArray(arr) {
   for (var i = 0; i < arr.length; i++) {
     if (arr[i] === undefined) {
       return
-    } else if (arr[i].value === 0) {
+    } else if (arr[i].value === -1) {
       suit = "Empty"
       value = arr[i].value
     } else if (arr[i].suit === "S" || arr[i].suit === "C") {
@@ -432,17 +468,54 @@ export function talonKingMatchInTableu() {
   var talonCard = talon[0]
   var lastTableu = getLastTableu()
   var isMatch = false
-  var toArray 
+  var toArray
   var tableuRow
   for (var i = 0; i < lastTableu.length; i++) {
-      if(talonCard.value == lastTableu[i].value + 14 &&
-          talonCard.suit !== lastTableu[i].suit) {
-              isMatch = true
-              tableuRow = i+1
-              toArray = getTableuRowFromIndex(i)
-          }
+    if (talonCard.value == lastTableu[i].value + 14 &&
+      talonCard.suit !== lastTableu[i].suit) {
+      isMatch = true
+      tableuRow = i + 1
+      toArray = getTableuRowFromIndex(i)
+    }
   }
-  return {isMatch, toArray, tableuRow}
+  return { isMatch, toArray, tableuRow }
+}
+
+export function tableuKingMatchInTableu() {
+  var firstTableu = getFirstTableu()
+  var lastTableu = getLastTableu()
+  var fromArray
+  var toArray
+  var toIndex
+  var isMatch = false
+  for (var i = 0; i < firstTableu.length; i++) {
+    for (var j = 0; j < lastTableu.length; j++) {
+      if (firstTableu !== undefined && lastTableu !== undefined) {
+        if (firstTableu[i].value == 13 &&
+          lastTableu[j].suit == "Empty") {
+          fromArray = getTableuRowFromIndex(i)
+          toArray = getTableuRowFromIndex(j)
+          if (fromArray[0].value !== 13) {
+            isMatch = true
+            toIndex = j+1
+          }
+        }
+      }
+
+    }
+  }
+  var fromIndex
+  if (isMatch == true) {
+    for (var i = 0; i < fromArray.length; i++) {
+      if (fromArray !== undefined) {
+        if (fromArray[i].value == 13) {
+          fromIndex = i
+        }
+      }
+
+    }
+  }
+  return { isMatch, fromArray, fromIndex, toArray, toIndex }
 }
 
 
