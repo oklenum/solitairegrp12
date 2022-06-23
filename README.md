@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+Klon eller åben projektet, hvis node js er installeret på enheden
+kør npm install og derefter npm start
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
