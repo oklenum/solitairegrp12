@@ -19,7 +19,39 @@ import "./inferring.css";
 import { cardImage } from "../../images";
 import { stepAfterScan } from "./stepss";
 import { arr } from "./stepss"
-import { moveCard, insertCardToArray,  } from "../../algorithm/game";
+import {
+  getFirstTableu,
+  insertCardToArray,
+  insertCardToTalon,
+  isMatchInTableu,
+  talonMatchInTableu,
+  talonMatchInSuit,
+  tableuMatchInSuit,
+  talonKingMatchInTableu,
+  moveCard,
+  getMatchTableu,
+  getIndexOfFirstTableuCard,
+  getMatchTableuRow,
+  getTableuRowFromIndex,
+  determineColorOfCard,
+  determineOppositeColorOfCard,
+  getLastTableu,
+} from "../../algorithm/script.js";
+import {
+  clubStack,
+  diamondStack,
+  heartStack,
+  spadeStack,
+  tableu1,
+  tableu2,
+  tableu3,
+  tableu4,
+  tableu5,
+  tableu6,
+  tableu7,
+  talon,
+} from "../../algorithm/gameModel";
+import { cardFormatter } from "../../cardformatter";
 
 
 const videoConstraints = {
@@ -29,23 +61,20 @@ const videoConstraints = {
 };
 
 const Inferring = () => {
-  const [base64Img, setBase64Img] = useState("");
-  const [cards, setCards] = useState([]);
   const [decks, setDecks] = useState([]);
   const [algoSteps, setAlgoSteps] = useState([]);
   const [instruction, setInstruction] = useState("");
   const [lastCard, setLastCard] = useState("");
   const [image, setImage] = useState("");
   const webcamRef = useRef(null);
-  const deck = [];
+
   const [state, setState] = useState("idle");
   const { seconds, minutes } = useStopwatch({ autoStart: true });
   const [tableau, setTableau] = useState("");
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(7);
   const [cardImg, setCardImg] = useState("");
-  const [deckState, setDeckState] = useState(false);
-  var index = 0;
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [lastFromArray, setLastFromArray] = useState([]);
 
   const dialogOpenHandler = () => {
     setDialogOpen(true);
@@ -83,27 +112,43 @@ const Inferring = () => {
       setTableau("Seventh Card in Tableau 7");
     }
     if (step == 7) {
-      setTableau("Talon Card");
+      setTableau("Scan Talon Card");
     }
-    if (step > 7) {
-      setTableau("Card if new revealed or press draw next")
+    if (step == 8) {
+      setTableau("Press draw next")
+
+    }
+    if (step > 8) {
+      setTableau("Scan card if new revealed or press draw next")
+    }
+    if (step == 999) {
+      setTableau("Scan Revealed Card In Tableau")
     }
 
+    //Tableau's
+    console.log("T1: ", tableu1)
+    console.log("T2: ", tableu2)
+    console.log("T3: ", tableu3)
+    console.log("T4: ", tableu4)
+    console.log("T5: ", tableu5)
+    console.log("T6: ", tableu6)
+    console.log("T7: ", tableu7)
+    console.log("Talon: ", talon)
+    console.log("CSuitStack: ", clubStack)
+    console.log("Current step", step)
+
+    /*
     if (stepAfterScan(step) !== undefined) {
       setAlgoSteps([
         ...algoSteps,
         stepAfterScan(step),
       ]);
     }
+    */
 
-    console.log(arr.length)
-    
-    
+
   }, [step]);
 
-  useEffect(() => {
-    // setCardImg(cardImage(lastCard))
-  }, [lastCard]);
 
   const scanCardHandler = (e) => {
     setState("loading");
@@ -123,7 +168,12 @@ const Inferring = () => {
       setImage("");
     }, 100);
   };
-
+  /*
+  Roboflow script: https://cdn.roboflow.com/0.2.22/roboflow.js
+  Brugt i forbindelse med billedegenkendelsen hvor de tilbyder et node.js
+  script til vores trænede modeller via deres platform.
+  Script bygget som en modificeret version af tensorflow js.
+  */
   function detection() {
     window.roboflow
       .auth({
@@ -133,7 +183,7 @@ const Inferring = () => {
         model: "cardssolitaire",
         version: 5,
       })
-      .then(function(model) {
+      .then(function (model) {
         model
           .configure({
             threshold: 0.65,
@@ -142,34 +192,168 @@ const Inferring = () => {
           })
 
           .detect(document.getElementById("detectImg"))
-          .then(function(predictions) {
+          .then(function (predictions) {
             console.log("Predictions:", predictions);
             if (predictions.length !== 0) {
-              if (!decks.includes(predictions[0].class)) {
-                setLastCard(
-                  predictions[0].class +
-                    "Confidence" +
-                    predictions[0].confidence
-                );
-                setDecks([...decks, predictions[0].class]);
-                setCardImg(predictions[0].class);
-                setStep((step) => step + 1);
-                setCards((cards) => [...cards, lastCard]);
-                //insertCardToArray()
+              setLastCard(
+                predictions[0].class +
+                "Confidence" +
+                predictions[0].confidence
+              );
 
-                
+              if (step == 0) {
+                insertCardToArray(tableu1, cardFormatter(predictions[0].class))
               }
+              if (step == 1) {
+                insertCardToArray(tableu2, cardFormatter(predictions[0].class))
+              }
+              if (step == 2) {
+                insertCardToArray(tableu3, cardFormatter(predictions[0].class))
+              }
+              if (step == 3) {
+                insertCardToArray(tableu4, cardFormatter(predictions[0].class))
+              }
+              if (step == 4) {
+                insertCardToArray(tableu5, cardFormatter(predictions[0].class))
+              }
+              if (step == 5) {
+                insertCardToArray(tableu6, cardFormatter(predictions[0].class))
+              }
+              if (step == 6) {
+                insertCardToArray(tableu7, cardFormatter(predictions[0].class))
+              }
+              if (step == 7) {
+                insertCardToTalon(talon, cardFormatter(predictions[0].class))
+              }
+              if (step == 999) {
+
+                lastFromArray.pop()
+                insertCardToArray(lastFromArray, cardFormatter(predictions[0].class))
+                setStep(8)
+              }
+
+              setDecks([...decks, predictions[0].class]);
+              setCardImg(predictions[0].class);
+              setStep((step) => step + 1);
+              //insertCardToArray()
+
+
             } else {
-              window.alert("No card predictions found, Scan Again");
+              //window.alert("No card predictions found, Scan Again");
               setCardImg("");
               setLastCard("");
               setStep((step) => step + 1);
             }
-
-            
-            
-
             setImage("");
+
+
+
+
+            if (step >= 8) {
+              //if (talon != undefined) {
+              if (talon[0].value === 1) {
+
+                switch (talon[0].suit) {
+                  case ("S"):
+                    moveCard(talon, 0, spadeStack)
+                    setAlgoSteps([
+                      ...algoSteps,
+                      "AS to F",
+                    ]);
+                    break;
+
+                  case ("C"):
+                    moveCard(talon, 0, clubStack)
+                    setAlgoSteps([
+                      ...algoSteps,
+                      "AC to F",
+                    ]);
+                    break;
+
+                  case ("H"):
+                    moveCard(talon, 0, heartStack)
+                    setAlgoSteps([
+                      ...algoSteps,
+                      "AH to F",
+                    ]);
+                    break;
+
+                  case ("D"):
+                    moveCard(talon, 0, diamondStack)
+                    setAlgoSteps([
+                      ...algoSteps,
+                      "AD to F",
+                    ]);
+                    break;
+                }
+                setStep(7)
+              }
+              //}
+
+
+              //Priority 3
+              else if (talonMatchInSuit().isMatch) {
+                var suitStack = talonMatchInSuit().suitStack
+                setAlgoSteps([
+                  ...algoSteps,
+                  talon[0].value + talon[0].suit + " to F",
+                ]);
+                moveCard(talon, 0, suitStack)
+                setStep(7)
+              }
+
+              //Priority 4
+              else if (tableuMatchInSuit().isMatch) {
+                var fromArray = tableuMatchInSuit().fromArray
+                var toArray = tableuMatchInSuit().toArray
+
+                setAlgoSteps([
+                  ...algoSteps,
+                  fromArray[fromArray.length - 1].value + fromArray[fromArray.length - 1].suit + " to F",
+                ]);
+                moveCard(fromArray, fromArray.length - 1, toArray)
+
+                setLastFromArray(fromArray);
+                if (fromArray.length > 0) {
+                  if (fromArray[fromArray.length - 1].suit == "Empty") {
+                    setStep(999);
+                  }
+                }
+
+
+              }
+              // Priority 5
+              else if(talonKingMatchInTableu().isMatch) {
+                var toArray = talonKingMatchInTableu().toArray
+                setAlgoSteps([
+                  ...algoSteps,
+                  talon[0].value + talon[0].suit + " to T" + talonKingMatchInTableu().tableuRow,
+                ]);
+                 moveCard(talon, 0, toArray)
+               }
+
+
+              //Priority 6
+              else if(talonMatchInTableu().isMatch) {
+                var toArray = talonMatchInTableu().toArray
+                setAlgoSteps([
+                  ...algoSteps,
+                  talon[0].value + talon[0].suit + " to " + toArray[toArray.length-1].value + toArray[toArray.length-1].suit,
+                ]);
+                moveCard(talon, 0, toArray)
+                setStep(7)
+              } 
+              
+              //Priority 7
+              else {
+                setAlgoSteps([
+                  ...algoSteps,
+                  "Draw Cards",
+                ]);
+                setStep(7)
+              }
+            }
+
           });
       });
   }
@@ -211,7 +395,7 @@ const Inferring = () => {
             </div>
 
             <div className="scanned-card">
-              <h2>{"Scan " + tableau} </h2>
+              <h2>{tableau} </h2>
 
               <img src={cardImage(cardImg)} width={62} height={84} />
 

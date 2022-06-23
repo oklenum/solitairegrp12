@@ -1,4 +1,3 @@
-//import { isEmptyObject } from "jquery";
 import {
   deck,
   pile,
@@ -13,341 +12,446 @@ import {
   clubStack,
   heartStack,
   diamondStack,
-  talon,
-} from "./gameModel.js";
+  talon
+} from "./gameModel.js"
 
-//setInitialStacks();
+
+
+
+
+
+//var suitStack = talonMatchInSuit().suitStack
+//moveCard(talon, 0, suitStack)
+//console.log(talonMatchInSuit())
 
 //log all stacks
-console.log("Foundation: ");
-console.log(spadeStack);
-console.log(clubStack);
-console.log(heartStack);
-console.log(diamondStack);
-console.log("Pile: ");
-console.log(pile);
-console.log("Talon: ");
-console.log(talon);
-console.log("Tableu rows: ");
-console.log(tableu1);
-console.log(tableu2);
-console.log(tableu3);
-console.log(tableu4);
-console.log(tableu5);
-console.log(tableu6);
-console.log(tableu7);
-console.log(getMatchSuit(tableu7));
-console.log(tableu7);
+console.log("Foundation: ")
+console.log("spadeStack: ", spadeStack)
+console.log("clubStack: ", clubStack)
+console.log("heartStack: ", heartStack)
+console.log("diamondStack: ", diamondStack)
+console.log("Talon: ")
+console.log(talon)
+console.log("Tableu rows: ")
+console.log("tableu1: ", tableu1)
+console.log("tableu2: ", tableu2)
+console.log("tableu3: ", tableu3)
+console.log("tableu4: ", tableu4)
+console.log("tableu5: ", tableu5)
+console.log("tableu6: ", tableu6)
+console.log("tableu7: ", tableu7)
+console.log("firstTableu: ", getFirstTableu())
+console.log("lastTableu: ", getLastTableu())
+console.log("SuitCards: ", getLastSuit())
 
-//test logs
+//console.log("match")
+console.log(tableuMatchInSuit())
 
-export function getMatchTableu(arr) {
-  let matchArray = [];
-  var suitMatch;
-  var valueMatch;
-  var Card;
-  var carVal;
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === undefined) {
-      /*
-      const EmptyCard = { suit: "EmptyCard", value: 0 };
-      matchArray.push(EmptyCard);
-      */
-      console.log("tried to push emptycard");
-      console.log(i);
-    } else if (arr[i].suit === "S" || arr[i].suit === "C") {
-      suitMatch = "Red";
-      valueMatch = arr[i].value + 1;
-      Card = { suit: suitMatch, value: valueMatch };
-      carVal = Card.value;
-    } else if (arr[i].suit === "H" || arr[i].suit === "D") {
-      suitMatch = "Black";
-      valueMatch = arr[i].value + 1;
-      Card = { suit: suitMatch, value: valueMatch };
-      carVal = Card.value;
+
+export function talonMatchInTableu() {
+  var talonArray = reformatCardArray(talon)
+  var talonCard = talonArray[0]
+  var lastTableu = reformatCardArray(getLastTableu())
+  var isMatch = false
+  var toArray
+  for (var i = 0; i < lastTableu.length; i++) {
+    if (talonCard != undefined && lastTableu != undefined) {
+      if (talonCard.value == lastTableu[i].value - 1 &&
+        talonCard.suit !== lastTableu[i].suit) {
+        isMatch = true
+        toArray = getTableuRowFromIndex(i)
+      }
     }
-    console.log(matchArray);
+
   }
-  return matchArray;
+  return { isMatch, toArray }
 }
 
-export function getMatchSuit(arr) {
-  var matchArray = [];
-  var valueMatch;
-  var suitMatch;
-  for (var i = 0; i < arr.length; i++) {
-    suitMatch = arr[i].suit;
-    valueMatch = arr[i].value - 1;
-    const Card = { suit: suitMatch, value: valueMatch };
-    matchArray.push(Card);
+// checks if an array has identical card in last Tableu
+export function tableuMatchInSuit() {
+  var lastTableu = getLastTableu()
+  var suitCards = getLastSuit()
+  var fromArray
+  var toArray
+  var isMatch = false
+  for (var i = 0; i < lastTableu.length; i++) {
+    for (var j = 0; j < suitCards.length; j++) {
+      if (lastTableu != undefined) {
+        if (lastTableu[i].value == suitCards[j].value + 1 &&
+          lastTableu[i].suit == suitCards[j].suit) {
+          isMatch = true
+          fromArray = getTableuRowFromIndex(i)
+          toArray = getSuitRowFromIndex(j)
+        }
+      }
+    }
   }
-  return matchArray;
+  return { isMatch, fromArray, toArray }
+}
+
+export function talonMatchInSuit() {
+  var talonCard = talon[0]
+  var suitCards = getLastSuit()
+  var isMatch = false
+  var suitStack
+  for (var i = 0; i < suitCards.length; i++) {
+    if (talonCard != undefined) {
+      if (talonCard.value == suitCards[i].value + 1 &&
+        talonCard.suit == suitCards[i].suit) {
+        isMatch = true
+        suitStack = getSuitRowFromIndex(i)
+      }
+    }
+
+  }
+  return { isMatch, suitStack }
+}
+
+export function matchInTableu() {
+  var firstTableu = reformatCardArray(getFirstTableu())
+  var lastTableu = reformatCardArray(getLastTableu())
+  var fromArray
+  var toArray
+  var index
+  var isMatch = false
+  for (var i = 0; i < firstTableu.length; i++) {
+    for (var j = 0; j < lastTableu.length; j++) {
+      if (firstTableu[i].value == lastTableu[j].value - 1 &&
+        firstTableu[i].suit !== lastTableu[j].suit &&
+        i !== j) {
+        index = i
+        fromArray = getTableuRowFromIndex(i + 1)
+        toArray = getTableuRowFromIndex(j + 1)
+        isMatch = true
+      }
+    }
+  }
+  var fromIndex
+  if (isMatch == true) {
+    for (var i = 0; i < fromArray.length; i++) {
+      for (var j = 0; j < toArray.length; j++) {
+        if (fromArray[i].value == toArray[j].value - 1 &&
+          fromArray[i].suit !== toArray[j].suit) {
+          fromIndex = i
+        } else {
+          fromIndex = 0
+        }
+      }
+    }
+  }
+  return { isMatch, fromArray, fromIndex, toArray, index }
+}
+
+
+export function getTableuOrder(arr) {
+  let tableu1 = arr.map(e => e.value).indexOf(getFirstTableu()[6])
+  return tableu1
 }
 
 export function getSuitRowFromIndex(index) {
   switch (index) {
-    case 0:
-      return spadeStack;
-    case 1:
-      return clubStack;
-    case 2:
-      return heartStack;
-    case 3:
-      return diamondStack;
+    case (0):
+      return spadeStack
+    case (1):
+      return clubStack
+    case (2):
+      return heartStack
+    case (3):
+      return diamondStack
   }
 }
 
 export function getTableuRowFromIndex(index) {
   switch (index) {
-    case 0:
-      return tableu1;
-    case 1:
-      return tableu2;
-    case 2:
-      return tableu3;
-    case 3:
-      return tableu4;
-    case 4:
-      return tableu5;
-    case 5:
-      return tableu6;
-    case 6:
-      return tableu7;
+    case (0):
+      return tableu1
+    case (1):
+      return tableu2
+    case (2):
+      return tableu3
+    case (3):
+      return tableu4
+    case (4):
+      return tableu5
+    case (5):
+      return tableu6
+    case (6):
+      return tableu7
   }
 }
 
-// checks if an array has identical card in last Tableu
-export function isMatchInTableu(arr) {
-  var match = false;
-  var array = determineColorOfCard(arr);
+export function reformatCardArray(arr) {
+  let array = [];
+  var suit;
+  var value;
+  var card;
   for (var i = 0; i < arr.length; i++) {
-    var lastTableu = determineColorOfCard(getLastTableu());
-    console.log(arr);
-    console.log(lastTableu);
-    for (var j = 0; j < lastTableu.length; j++) {
-      if (
-        arr[i].suit === lastTableu[j].suit &&
-        arr[i].value === lastTableu[j].value
-      ) {
-        match = true;
-      }
+    if (arr[i] === undefined) {
+      return
+    } else if (arr[i].value === 0) {
+      suit = "Empty"
+      value = arr[i].value
+    } else if (arr[i].suit === "S" || arr[i].suit === "C") {
+      suit = "Black";
+      value = arr[i].value
+    } else if (arr[i].suit === "H" || arr[i].suit === "D") {
+      value = arr[i].value
+      suit = "Red";
     }
+    card = { suit: suit, value: value }
+    array.push(card);
   }
-  return match;
+  return array;
 }
 
-// returns what tableu row contains arr match.
-export function getMatchTableuRow(arr) {
-  var from;
-  var to;
-  for (var i = 0; i < arr.length; i++) {
-    var lastTableu = determineColorOfCard(getLastTableu());
-    for (var j = 0; j < lastTableu.length; j++) {
-      if (
-        arr[i].suit === lastTableu[j].suit &&
-        arr[i].value === lastTableu[j].value
-      ) {
-        console.log("Match Found");
-        from = i;
-        to = j;
-      }
-    }
-  }
-  console.log(from);
-  console.log(to);
-  console.log(arr);
-  console.log(lastTableu);
-  return { from, to };
-}
 
+
+// returns what tableu row contains arr match. 
 export function getMatchIndex(arr) {
-  var index;
+  var index
   for (var i = 0; i < arr.length; i++) {
-    var lastTableu = getLastTableu();
+    var lastTableu = getLastTableu()
     for (var j = 0; j < lastTableu.length; j++) {
       if (arr[i] == lastTableu[j]) {
-        index = i;
+        index = i
       }
     }
   }
-  return index;
+  return index
 }
 
 export function isMatchInSuit(arr) {
-  var match = false;
+  var match = false
   for (var i = 0; i < arr.length; i++) {
-    var lastTableu = getLastSuit();
+    var lastTableu = getLastSuit()
     for (var j = 0; j < lastTableu.length; j++) {
       if (arr[i] == lastTableu[j]) {
-        match = true;
+        match = true
       }
     }
   }
-  return match;
+  return match
 }
 
 export function getMatchSuitRow(arr) {
   for (var i = 0; i < arr.length; i++) {
-    var lastTableu = getLastSuit();
+    var lastTableu = getLastSuit()
     for (var j = 0; j < lastTableu.length; j++) {
       if (arr[i] == lastTableu[j]) {
-        var from = i;
-        var to = j;
+        var from = i
+        var to = j
       }
     }
   }
-  return { from, to };
+  return { from, to }
 }
+
+
 
 // returns index of first card with given value from given array
 export function getCardIndex(arr, value) {
   if (value != null) {
-    const index = arr.map((e) => e.value).indexOf(value);
-    return index;
-  } else return;
+    const index = arr.map(e => e.value).indexOf(value);
+    return index
+  } else return
+
 }
 
 export function getIndexOfFirstTableuCard(arr) {
   var index;
   for (var i = 0; i < arr.length; i++) {
-    if (arr[i].value !== 0) {
-      index = i;
+    if (arr[i].value !== -1) {
+      index = i
+      return index
     }
   }
-  return index;
+  return 0
 }
 
 // moves cards from array to array
 export function moveCard(fromArray, fromIndex, toArray) {
-  const removedCards = fromArray.splice(fromIndex);
+  const removedCards = fromArray.splice(fromIndex)
   for (var i = 0; i < removedCards.length; i++) {
-    toArray.push(removedCards[i]);
+    toArray.push(removedCards[i])
   }
-  console.log(toArray);
+
 }
 
-function insertEmptyCards(arr, amount) {
-  let card = { suit: "Empty", value: 0 };
-  for (var i = 0; i < amount; i++) {
-    arr.push(card);
+export function functionFillStacks(arr, startIndex, endIndex) {
+  let cards = deck.cards.slice(startIndex, endIndex)
+  for (var i = 0; i < cards.length; i++) {
+    arr.push(cards[i])
   }
+
 }
 
-function setInitialStacks() {
-  insertEmptyCards(tableu2, 1);
-  insertEmptyCards(tableu3, 2);
-  insertEmptyCards(tableu4, 3);
-  insertEmptyCards(tableu5, 4);
-  insertEmptyCards(tableu6, 5);
-  insertEmptyCards(tableu7, 6);
+export function getCard() {
+
+}
+
+export function setInitialStacks() {
+  //Fill arrays with cards
+  functionFillStacks(heartStack, 0, 5)
+  functionFillStacks(diamondStack, 5, 7)
+  functionFillStacks(spadeStack, 7, 10)
+  functionFillStacks(clubStack, 10, 13)
+
+  functionFillStacks(tableu1, 0, 1)
+  functionFillStacks(tableu2, 1, 3)
+  functionFillStacks(tableu3, 3, 6)
+  functionFillStacks(tableu4, 6, 10)
+  functionFillStacks(tableu5, 10, 15)
+  functionFillStacks(tableu6, 15, 21)
+  functionFillStacks(tableu7, 21, 28)
+  functionFillStacks(pile, 28, 51)
+  functionFillStacks(talon, 0, 1)
+  //flip last card of tableu array
+  talon[0].turnCard()
+  for (var i = 0; i < getLastTableu().length; i++) {
+    let arr = getLastTableu()
+    arr[i].turnCard()
+  }
+
 }
 
 export function getLastTableu() {
-  var arrayOfLastTableu = [];
-  let tableu1LastElement = tableu1[tableu1.length - 1];
-  let tableu2LastElement = tableu2[tableu2.length - 1];
-  let tableu3LastElement = tableu3[tableu3.length - 1];
-  let tableu4LastElement = tableu4[tableu4.length - 1];
-  let tableu5LastElement = tableu5[tableu5.length - 1];
-  let tableu6LastElement = tableu6[tableu6.length - 1];
-  let tableu7LastElement = tableu7[tableu7.length - 1];
+  var arrayOfLastTableu = []
+  let tableu1LastElement = tableu1[tableu1.length - 1]
+  let tableu2LastElement = tableu2[tableu2.length - 1]
+  let tableu3LastElement = tableu3[tableu3.length - 1]
+  let tableu4LastElement = tableu4[tableu4.length - 1]
+  let tableu5LastElement = tableu5[tableu5.length - 1]
+  let tableu6LastElement = tableu6[tableu6.length - 1]
+  let tableu7LastElement = tableu7[tableu7.length - 1]
+  let emptyArrayCard = { suit: "EmptyArray", value: -1 }
 
-  arrayOfLastTableu.push(
-    tableu1LastElement,
-    tableu2LastElement,
-    tableu3LastElement,
-    tableu4LastElement,
-    tableu5LastElement,
-    tableu6LastElement,
-    tableu7LastElement
-  );
+  if (tableu1LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu1LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
 
-  return arrayOfLastTableu;
+  if (tableu2LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu2LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+  if (tableu3LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu3LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+  if (tableu4LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu4LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+  if (tableu5LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu5LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+  if (tableu6LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu6LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+  if (tableu7LastElement !== undefined) {
+    arrayOfLastTableu.push(tableu7LastElement)
+  } else { arrayOfLastTableu.push(emptyArrayCard) }
+
+
+  return arrayOfLastTableu
 }
 
 export function getFirstTableu() {
-  var arrayOfFirstTableu = [];
-  let tableu1FirstElement = tableu1[getIndexOfFirstTableuCard(tableu1)];
-  let tableu2FirstElement = tableu2[getIndexOfFirstTableuCard(tableu2)];
-  let tableu3FirstElement = tableu3[getIndexOfFirstTableuCard(tableu3)];
-  let tableu4FirstElement = tableu4[getIndexOfFirstTableuCard(tableu4)];
-  let tableu5FirstElement = tableu5[getIndexOfFirstTableuCard(tableu5)];
-  let tableu6FirstElement = tableu6[getIndexOfFirstTableuCard(tableu6)];
-  let tableu7FirstElement = tableu7[getIndexOfFirstTableuCard(tableu7)];
+  var arrayOfFirstTableu = []
+  let tableu1FirstElement = tableu1[getIndexOfFirstTableuCard(tableu1)]
+  let tableu2FirstElement = tableu2[getIndexOfFirstTableuCard(tableu2)]
+  let tableu3FirstElement = tableu3[getIndexOfFirstTableuCard(tableu3)]
+  let tableu4FirstElement = tableu4[getIndexOfFirstTableuCard(tableu4)]
+  let tableu5FirstElement = tableu5[getIndexOfFirstTableuCard(tableu5)]
+  let tableu6FirstElement = tableu6[getIndexOfFirstTableuCard(tableu6)]
+  let tableu7FirstElement = tableu7[getIndexOfFirstTableuCard(tableu7)]
+  let emptyArrayCard = { suit: "EmptyArray", value: -1 }
 
-  arrayOfFirstTableu.push(
-    tableu1FirstElement,
-    tableu2FirstElement,
-    tableu3FirstElement,
-    tableu4FirstElement,
-    tableu5FirstElement,
-    tableu6FirstElement,
-    tableu7FirstElement
-  );
+  if (tableu1FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu1FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
 
-  return arrayOfFirstTableu;
-}
+  if (tableu2FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu2FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
 
-export function determineOppositeColorOfCard(arr) {
-  let matchArray = [];
-  var suitMatch;
-  var card;
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === undefined) {
-      const emptyCard = { suit: "EmptyCard", value: 0 };
-      matchArray.push(emptyCard);
-    } else if (arr[i].suit === "S" || arr[i].suit === "C") {
-      suitMatch = "Red";
-      card = { suit: suitMatch, value: arr[i].value };
-      matchArray.push(card);
-    } else if (arr[i].suit === "H" || arr[i].suit === "D") {
-      suitMatch = "Black";
-      card = { suit: suitMatch, value: arr[i].value };
-      matchArray.push(card);
-    }
-  }
-  return matchArray;
-}
+  if (tableu3FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu3FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
 
-export function determineColorOfCard(arr) {
-  let matchArray = [];
-  var suitMatch;
-  var card;
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === undefined) {
-      const emptyCard = { suit: "EmptyCard", value: 0 };
-      matchArray.push(emptyCard);
-    } else if (arr[i].suit === "S" || arr[i].suit === "C") {
-      suitMatch = "Black";
-      card = { suit: suitMatch, value: arr[i].value };
-      matchArray.push(card);
-    } else if (arr[i].suit === "H" || arr[i].suit === "D") {
-      suitMatch = "Red";
-      card = { suit: suitMatch, value: arr[i].value };
-      matchArray.push(card);
-    }
-  }
-  return matchArray;
+  if (tableu4FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu4FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
+
+  if (tableu5FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu5FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
+
+  if (tableu6FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu6FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
+
+  if (tableu7FirstElement !== undefined) {
+    arrayOfFirstTableu.push(tableu7FirstElement)
+  } else { arrayOfFirstTableu.push(emptyArrayCard) }
+
+  return arrayOfFirstTableu
 }
 
 export function getLastSuit() {
-  var arrayOfLastSuit = [];
-  let spadeStackLastElement = spadeStack[spadeStack.length - 1];
-  let clubStackLastElement = clubStack[clubStack.length - 1];
-  let heartStackLastElement = heartStack[heartStack.length - 1];
-  let diamondStackLastElement = diamondStack[diamondStack.length - 1];
+  var arrayOfLastSuit = []
+  let spadeStackLastElement = spadeStack[spadeStack.length - 1]
+  let clubStackLastElement = clubStack[clubStack.length - 1]
+  let heartStackLastElement = heartStack[heartStack.length - 1]
+  let diamondStackLastElement = diamondStack[diamondStack.length - 1]
+  let emptyArrayCard = { suit: "EmptyArray", value: -1 }
 
-  arrayOfLastSuit.push(
-    spadeStackLastElement,
-    clubStackLastElement,
-    heartStackLastElement,
-    diamondStackLastElement
-  );
+  if (spadeStackLastElement !== undefined) {
+    arrayOfLastSuit.push(spadeStackLastElement)
+  } else { arrayOfLastSuit.push(emptyArrayCard) }
 
-  return arrayOfLastSuit;
+  if (clubStackLastElement !== undefined) {
+    arrayOfLastSuit.push(clubStackLastElement)
+  } else { arrayOfLastSuit.push(emptyArrayCard) }
+
+  if (heartStackLastElement !== undefined) {
+    arrayOfLastSuit.push(heartStackLastElement)
+  } else { arrayOfLastSuit.push(emptyArrayCard) }
+
+  if (diamondStackLastElement !== undefined) {
+    arrayOfLastSuit.push(diamondStackLastElement)
+  } else { arrayOfLastSuit.push(emptyArrayCard) }
+
+
+  return arrayOfLastSuit
+
 }
+
+export function talonKingMatchInTableu() {
+  var talonCard = talon[0]
+  var lastTableu = getLastTableu()
+  var isMatch = false
+  var toArray 
+  var tableuRow
+  for (var i = 0; i < lastTableu.length; i++) {
+      if(talonCard.value == lastTableu[i].value + 14 &&
+          talonCard.suit !== lastTableu[i].suit) {
+              isMatch = true
+              tableuRow = i+1
+              toArray = getTableuRowFromIndex(i)
+          }
+  }
+  return {isMatch, toArray, tableuRow}
+}
+
 
 export function insertCardToArray(arr, card) {
   arr.push(card);
+  console.log(card);
+}
+
+export function insertCardToTalon(arr, card) {
+  arr.splice(0, 1, card);
   console.log(card);
 }

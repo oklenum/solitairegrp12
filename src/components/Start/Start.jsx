@@ -1,7 +1,15 @@
+/*
+Startside kort animation fra https://codepen.io/EdgeK/pen/rWdGXv
+SVG cards lavet af Chris Aguilar:
+https://sourceforge.net/projects/vector-cards/
+
+*/
+
 import React, { useState } from 'react'
 import './start.css'
 import ReactiveButton from 'reactive-button'
 import { Link } from 'react-router-dom';
+
 
 const Start = () => {
     const [state, setState] = useState('idle');

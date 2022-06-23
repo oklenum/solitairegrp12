@@ -8,7 +8,6 @@ const Menu = () => (
 )
 
 const Header = () => {
-  const [time, setTime] = useState(undefined)
     return (
         <div className='solitaireSolver-header'>
             <Menu />

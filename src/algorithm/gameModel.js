@@ -12,7 +12,7 @@ var clubStack = [];
 var heartStack = [];
 var diamondStack = [];
 
-//talon
+//talon { suit: "H", value: 1}
 var talon = [];
 
 // tableau stacks
@@ -22,9 +22,11 @@ var tableu2 = [
   { suit: "C", value: 5 },
 ];
 var tableu3 = [
+  /*
   { suit: "Empty", value: 0 },
   { suit: "Empty", value: 0 },
   { suit: "C", value: 6 },
+  */
 ];
 var tableu4 = [
   { suit: "Empty", value: 0 },
@@ -54,7 +56,7 @@ var tableu7 = [
   { suit: "Empty", value: 0 },
   { suit: "Empty", value: 0 },
   { suit: "Empty", value: 0 },
-  { suit: "C", value: 7 },
+  { suit: "C", value: 2 },
 ];
 
 export {

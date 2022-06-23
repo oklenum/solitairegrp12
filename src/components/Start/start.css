@@ -1,12 +1,8 @@
 /*
-Scalabe CSS cards with minimal markup. The goal was to try to do this using only one tag per card, and not relying on lots of HTML to do the job. Also no javascript.
-Just changing the height and width of the card class will change everything else.
-Cards designed to have a 1:1.4 width to height ratio.
-SVG is taken from the SVG cards by Chris Aguilar here:
+Startside kort animation fra https://codepen.io/EdgeK/pen/rWdGXv
+SVG cards lavet af Chris Aguilar:
 https://sourceforge.net/projects/vector-cards/
-The cards are a little more optimized and layered so they can use fragment identifiers, and keep this at only one single file. This Mostly uses psuedo elements and multiple background positioning to keep the HTML short and sweet. Should work in the latest version of Safari iOS, but not earlier versions.
-SVG file weighs in at 505KB and minified CSS is only 8KB. Cleaning up and optimizing the face cards could really get that lower, as they are the heaviest part.
-Font for letters is Bree Serif (google fonts)
+
 */
 @keyframes fly-in {
     0% {
